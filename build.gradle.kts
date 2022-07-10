@@ -1,9 +1,7 @@
 @file:Suppress("PropertyName")
 
+import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
 import net.minecraftforge.gradle.common.util.RunConfig
-
-// shadow
-//import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
 
 buildscript {
     repositories {
@@ -25,8 +23,7 @@ plugins {
     kotlin("jvm") version "1.6.10"
     java
     id("net.minecraftforge.gradle") version "5.+"
-    // shadow
-//    id("com.github.johnrengelman.shadow") version "7.1.2"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
 //apply(plugin = "kotlin")
@@ -38,6 +35,7 @@ val mod_version: String by project
 val mappings_version: String by project
 val forge_version: String by project
 val display_name: String by project
+val kord_version: String by project
 // devauth
 //val devauth_version: String by project
 
@@ -56,6 +54,10 @@ sourceSets.main {
     java {
         srcDir(generatedRoot)
     }
+}
+
+kotlin.sourceSets.all {
+    languageSettings.optIn("kotlin.RequiresOptIn")
 }
 
 minecraft.apply {
@@ -132,22 +134,20 @@ val generateConsts by tasks.registering {
 }
 
 val library = configurations.getAt("library")
-// shadow
-//val shade: Configuration by configurations.creating { }
-//val relocateShadowJar =
-//    tasks.register<ConfigureShadowRelocation>("relocateShadowJar") {
-//        target = tasks.shadowJar.get()
-//        prefix = "${project.group}.repack"
-//    }
+val shade: Configuration by configurations.creating { }
+val relocateShadowJar =
+    tasks.register<ConfigureShadowRelocation>("relocateShadowJar") {
+        target = tasks.shadowJar.get()
+        prefix = "${project.group}.repack"
+    }
 
 tasks {
-    // shadow
-//    shadowJar {
-//        configurations.clear()
-//        configurations.add(shade)
-//        dependsOn(relocateShadowJar)
-//        minimize()
-//    }
+    shadowJar {
+        configurations.clear()
+        configurations.add(shade)
+        dependsOn(relocateShadowJar)
+        minimize()
+    }
 
     jar {
         finalizedBy("reobfJar")
@@ -163,6 +163,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
 }
 
 repositories {
+    mavenCentral()
     // devauth
 //    maven { url = uri("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1" )}
 }
@@ -171,14 +172,17 @@ dependencies {
     // Use the latest version of Minecraft Forge
     minecraft("net.minecraftforge:forge:$forge_version")
     fun add(path: String, block: ExternalModuleDependency.() -> Unit = {}) {
+        // todo: maybe use a custom configuration instead
         library(path, block)
-        // shadow
-//        shade(path, block)
+        shade(path, block)
         implementation(path, block)
     }
 
     // devauth
 //    runtimeOnly("me.djtheredstoner:DevAuth-forge-latest:${devauth_version}")
+    add("dev.kord:kord-core:$kord_version") {
+        exclude("org.jetbrains", "annotations")
+    }
 }
 
 tasks.withType<Jar> {
