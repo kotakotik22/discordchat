@@ -15,6 +15,7 @@ sealed interface CommandConfig<T : Any> : ReadOnlyProperty<Any?, T> {
     val default: T
     val comments: Array<out String>
     val name: String
+    val category: String?
 
     fun register(b: ForgeConfigSpec.Builder): ConfigValue<T>
     fun castValue(v: Any): T
@@ -24,7 +25,7 @@ sealed interface CommandConfig<T : Any> : ReadOnlyProperty<Any?, T> {
 
     class StringCommandConfig(
         override val default: String, override val comments: Array<out String>, override val name: String,
-        override val commandName: String
+        override val commandName: String, override val category: String?
     ) : CommandConfig<String> {
         override fun register(b: ForgeConfigSpec.Builder): ConfigValue<String> =
             b.comment(*comments).define(name, default)
@@ -36,10 +37,13 @@ sealed interface CommandConfig<T : Any> : ReadOnlyProperty<Any?, T> {
 
 abstract class Command(val name: String, val defaultDescription: String) {
     val config = arrayListOf<CommandConfig<*>>()
-    protected fun config(name: String, default: String, vararg comments: String) =
-        CommandConfig.StringCommandConfig(default, comments, name, this.name).also {
+    protected fun config(name: String, default: String, vararg comments: String, category: String? = null) =
+        CommandConfig.StringCommandConfig(default, comments, name, this.name, category).also {
             config.add(it)
         }
+
+    protected fun messageConfig(name: String, default: String, vararg comments: String) =
+        config(name, default, *comments, category = "messages")
 
     protected abstract suspend fun GuildChatInputCommandInteractionCreateEvent.execute()
 

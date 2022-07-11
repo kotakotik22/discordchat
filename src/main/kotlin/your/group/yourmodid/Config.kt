@@ -92,7 +92,15 @@ object Config {
         b.comment("Settings for /${cmd.name}").push(cmd.name)
         val configs = hashMapOf<String, ConfigValue<*>>()
         for (c in cmd.config) {
-            configs[c.name] = c.register(b)
+            if (c.category == null)
+                configs[c.name] = c.register(b)
+            else {
+                b.push(c.category)
+                configs[c.name] = c.register(
+                    b
+                )
+                b.pop()
+            }
         }
         val v = CommandConfig(
             b.comment("Description for /${cmd.name}").define("description", cmd.defaultDescription),
