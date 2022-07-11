@@ -53,6 +53,11 @@ object Config {
             .define("playerJoin", "%s joined")
         val playerLeave: String by b.comment("Appears when a player leaves")
             .define("playerLeft", "%s left")
+        val displayedIp: String by b.comment(
+            "The displayed IP with the /ip discord command, if blank, the mod will try to find the IP automatically but it may be wrong",
+            "The IP finder will first attempt to fetch it from server.properties, then if that's blank, from the InetAddress java class"
+        )
+            .define("displayedIp", "")
 
         init {
             b.pop()
