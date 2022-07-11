@@ -6,8 +6,9 @@ import dev.kord.core.event.interaction.GuildChatInputCommandInteractionCreateEve
 import dev.kord.core.on
 import your.group.yourmodid.commands.*
 
-val discordCommands = listOf(ListCommand, WhitelistMessageCommand, LatestCommand, LogCommand, CtLogCommand)
-    .associateBy { it.name }
+val discordCommands =
+    listOf(ListCommand, WhitelistMessageCommand, LatestCommand, LogCommand, CtLogCommand, EntityListCommand)
+        .associateBy { it.name }
 
 suspend fun setUpCommands(guild: Snowflake, kord: Kord) {
     kord.on<GuildChatInputCommandInteractionCreateEvent> {
