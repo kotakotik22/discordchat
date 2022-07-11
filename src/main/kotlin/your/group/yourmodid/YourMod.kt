@@ -1,6 +1,13 @@
 package your.group.yourmodid
 
+import dev.kord.core.behavior.interaction.response.DeferredEphemeralMessageInteractionResponseBehavior
+import dev.kord.core.behavior.interaction.response.respond
 import dev.kord.core.entity.User
+import dev.kord.core.event.interaction.ApplicationCommandInteractionCreateEvent
+import dev.kord.rest.builder.message.modify.InteractionResponseModifyBuilder
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import net.minecraft.SharedConstants
 import net.minecraft.client.Minecraft
@@ -139,3 +146,16 @@ fun checkLegalFromMinecraft(plr: ServerPlayer, str: String, message: Boolean = t
 fun Any?.void() {}
 
 val <T> Optional<T>.nullable get() = if (isPresent) get() else null
+
+suspend inline fun Deferred<DeferredEphemeralMessageInteractionResponseBehavior>.respond(builder: InteractionResponseModifyBuilder.() -> Unit) =
+    await().respond {
+        builder()
+    }
+
+suspend fun Deferred<DeferredEphemeralMessageInteractionResponseBehavior>.respond(msgContent: String) =
+    respond {
+        content = msgContent
+    }
+
+fun <T> T.deferEpheremalResponseAsync() where T : CoroutineScope, T : ApplicationCommandInteractionCreateEvent =
+    async { interaction.deferEphemeralResponse() }

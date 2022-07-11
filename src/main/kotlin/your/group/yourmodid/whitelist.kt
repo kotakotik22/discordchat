@@ -9,7 +9,6 @@ import dev.kord.core.behavior.edit
 import dev.kord.core.behavior.interaction.modal
 import dev.kord.core.behavior.interaction.respondEphemeral
 import dev.kord.core.behavior.interaction.response.edit
-import dev.kord.core.behavior.interaction.response.respond
 import dev.kord.core.builder.components.emoji
 import dev.kord.core.entity.ReactionEmoji
 import dev.kord.core.entity.channel.TextChannel
@@ -56,15 +55,11 @@ suspend fun setUpWhitelist(kord: Kord) {
                 val response = async { interaction.deferEphemeralResponse() }
                 val (_, id, username) = dataInMessageRegex.matchEntire(interaction.message.content)!!.groupValues
                 val gameProfile = server.profileCache.get(username).nullable
-                    ?: return@on response.await().respond {
-                        content = "Could not find profile with username $username"
-                    }.void()
+                    ?: return@on response.respond("Could not find profile with username $username").void()
                 val whitelist = server.playerList.whiteList
                 if (!whitelist.isWhiteListed(gameProfile))
                     whitelist.add(UserWhiteListEntry(gameProfile))
-                else return@on response.await().respond {
-                    content = "$username already whitelisted"
-                }.void()
+                else return@on response.respond("$username already whitelisted").void()
                 if (Config.dmOnWhitelist)
                     launch {
                         kord.getUser(Snowflake(id))?.getDmChannelOrNull()
@@ -78,9 +73,7 @@ suspend fun setUpWhitelist(kord: Kord) {
                         components = mutableListOf()
                     }
                 }
-                response.await().respond {
-                    content = "$username whitelisted"
-                }
+                response.respond("$username whitelisted")
             }
             whitelistDenyButtonId -> {
                 interaction.modal("Deny", whitelistDenyModalId) {
@@ -120,9 +113,7 @@ suspend fun setUpWhitelist(kord: Kord) {
                             }
                     }
                 }
-                response.await().respond {
-                    content = "$username denied"
-                }
+                response.respond("$username denied")
             }
             whitelistModalId -> {
                 val username = interaction.actionRows[0].textInputs[whitelistInputId]!!.value!!
