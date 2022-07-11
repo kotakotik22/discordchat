@@ -8,13 +8,10 @@ import your.group.yourmodid.respond
 import java.io.File
 import java.io.IOException
 
-fun dmMessage(what: String) =
-    "Sends the $what to your DMs"
-
 fun UserMessageCreateBuilder.file(f: File) =
     files.add(NamedFile(f.name, f.inputStream()))
 
-abstract class FileCommand(name: String, description: String) : AdminCommand(name, dmMessage(description)) {
+abstract class FileCommand(name: String, description: String) : AdminCommand(name, "Sends you the $description") {
     @Throws(IOException::class)
     abstract suspend fun getFile(): File?
 
