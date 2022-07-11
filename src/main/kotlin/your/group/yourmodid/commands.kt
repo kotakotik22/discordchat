@@ -7,7 +7,16 @@ import dev.kord.core.on
 import your.group.yourmodid.commands.*
 
 val discordCommands =
-    listOf(ListCommand, WhitelistMessageCommand, LatestCommand, LogCommand, CtLogCommand, EntityListCommand, IpCommand)
+    listOf(
+        ListCommand,
+        WhitelistMessageCommand,
+        LatestCommand,
+        LogCommand,
+        CtLogCommand,
+        EntityListCommand,
+        IpCommand,
+        TpsCommand
+    )
         .associateBy { it.name }
 
 suspend fun setUpCommands(guild: Snowflake, kord: Kord) {
