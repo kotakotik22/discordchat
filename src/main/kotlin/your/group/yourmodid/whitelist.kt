@@ -38,7 +38,7 @@ val dataInMessageRegex =
 
 suspend fun setUpWhitelist(kord: Kord) {
     val channel =
-        kord.getChannel(Snowflake(Config.whitelistChannel.ifEmpty { return logger.error("Whitelist channel was empty") })) as? TextChannel
+        kord.getChannel(Snowflake(Config.Channels.whitelistChannel.ifEmpty { return logger.error("Whitelist channel was empty") })) as? TextChannel
             ?: return logger.error("Could not find provided whitelist channel or it was not a text channel")
     kord.on<ButtonInteractionCreateEvent> {
         when (interaction.componentId) {

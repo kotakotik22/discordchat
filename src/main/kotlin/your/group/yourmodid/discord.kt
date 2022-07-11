@@ -27,7 +27,7 @@ fun logInDiscord() {
         logger.info("Setting up client")
         val kord = Kord(token)
         val channel =
-            kord.getChannel(Snowflake(Config.channel.ifEmpty { error("Provided channel ID is empty") })) as? TextChannel
+            kord.getChannel(Snowflake(Config.Channels.chatChannel.ifEmpty { error("Provided channel ID is empty") })) as? TextChannel
                 ?: error("Channel could not be found or was not a text channel")
         val webhook =
             channel.webhooks.firstOrNull { it.name == webhookName } ?: channel.createWebhook(webhookName) {
@@ -49,7 +49,7 @@ fun logInDiscord() {
 
         launch {
             kord.on<MessageCreateEvent> {
-                if (message.channelId.toString() == Config.channel) {
+                if (message.channelId.toString() == Config.Channels.chatChannel) {
                     createMcMessage(webhook)
                 }
             }

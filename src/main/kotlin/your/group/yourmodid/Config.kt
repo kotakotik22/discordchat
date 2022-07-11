@@ -14,10 +14,9 @@ val token = File(tokenFilename).also {
 object Config {
     private val b = Builder()
 
-    val channel: String by b.comment("ID for the channel where messages will be sent and read from")
-        .define("channel", "")
     val queueSize: Int by b.comment(
-        "The size of the message queue, if the queue reaches full capacity, " +
+        "The size of the message queue",
+        "if the queue reaches full capacity, " +
                 "then any code attempting to enqueue a message will suspend until there is space in the queue"
     )
         .define("queueSize", 32)
@@ -25,8 +24,6 @@ object Config {
         .define("playerAvatarUrl", "https://crafatar.com/avatars/%s?overlay")
     val notifyOnIllegal: Boolean by b.comment("Whether to notify senders when their message or display name contains illegal characters")
         .define("notifyOnIllegal", true)
-    val whitelistChannel: String by b.comment("ID for the channel where whitelist requests will be sent")
-        .define("whitelistChannel", "")
     val dmOnWhitelist: Boolean by b.comment("Whether to DM a user when they get whitelisted")
         .define("dmOnWhitelist", true)
     val deleteOnWhitelist: Boolean by b.comment("Whether to delete a whitelist request message after it is accepted or denied")
@@ -35,7 +32,23 @@ object Config {
         .define("whitelistDenial", true)
 
     init {
+        Channels
         Messages
+    }
+
+    object Channels {
+        init {
+            b.push("channels")
+        }
+
+        val chatChannel: String by b.comment("ID for the channel where messages will be sent and read from")
+            .define("chat", "")
+        val whitelistChannel: String by b.comment("ID for the channel where whitelist requests will be sent")
+            .define("whitelist", "")
+
+        init {
+            b.pop()
+        }
     }
 
     object Messages {
