@@ -1,12 +1,10 @@
 package your.group.yourmodid.command
 
-import dev.kord.core.behavior.channel.createMessage
 import dev.kord.core.event.interaction.GuildChatInputCommandInteractionCreateEvent
 import dev.kord.rest.NamedFile
 import dev.kord.rest.builder.message.create.UserMessageCreateBuilder
-import kotlinx.coroutines.async
+import your.group.yourmodid.deferEpheremalResponseAsync
 import your.group.yourmodid.respond
-import your.group.yourmodid.void
 import java.io.File
 import java.io.IOException
 
@@ -21,17 +19,16 @@ abstract class FileCommand(name: String, description: String) : AdminCommand(nam
     abstract suspend fun getFile(): File?
 
     override suspend fun GuildChatInputCommandInteractionCreateEvent.execute() {
-        val response = coroutineScope.async { interaction.deferEphemeralResponse() }
+        val response = deferEpheremalResponseAsync()
 
         try {
-            getFile()?.let { file ->
-                interaction.user.getDmChannelOrNull()?.createMessage {
-                    file(file)
-                } ?: return response.respond("Your DMs seem to be closed").void()
-            } ?: return response.respond("Could not find file").void()
-            response.respond("Done!")
+            getFile()?.let {
+                response.respond {
+                    addFile(it.toPath())
+                }
+            } ?: response.respond("Could not find file")
         } catch (e: IOException) {
-            response.respond("Something went wrong accessing the log: $e")
+            response.respond("Something went wrong accessing the file: $e")
         }
     }
 }
