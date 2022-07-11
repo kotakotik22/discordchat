@@ -2,6 +2,7 @@ package your.group.yourmodid
 
 import net.minecraftforge.common.ForgeConfigSpec
 import net.minecraftforge.common.ForgeConfigSpec.Builder
+import net.minecraftforge.common.ForgeConfigSpec.ConfigValue
 import net.minecraftforge.fml.config.ModConfig
 import thedarkcolour.kotlinforforge.forge.registerConfig
 import java.io.File
@@ -38,6 +39,7 @@ object Config {
 
     object Channels {
         init {
+            b.comment("IDs for discord channels")
             b.push("channels")
         }
 
@@ -53,6 +55,7 @@ object Config {
 
     object Messages {
         init {
+            b.comment("Messages that appear in discord and minecraft")
             b.push("messages")
         }
 
@@ -66,15 +69,41 @@ object Config {
             .define("playerJoin", "%s joined")
         val playerLeave: String by b.comment("Appears when a player leaves")
             .define("playerLeft", "%s left")
-        val displayedIp: String by b.comment(
-            "The displayed IP with the /ip discord command, if blank, the mod will try to find the IP automatically but it may be wrong",
-            "The IP finder will first attempt to fetch it from server.properties, then if that's blank, from the InetAddress java class"
-        )
-            .define("displayedIp", "")
+
 
         init {
             b.pop()
         }
+    }
+
+    init {
+        b.comment("Settings for the commands", "This is automatically generated")
+        b.push("commands")
+    }
+
+    class CommandConfig(
+        description: ForgeConfigSpec.ConfigValue<String>,
+        val configs: HashMap<String, ForgeConfigSpec.ConfigValue<*>>
+    ) {
+        val description by description
+    }
+
+    val commandConfigs = discordCommands.mapValues { (_, cmd) ->
+        b.comment("Settings for /${cmd.name}").push(cmd.name)
+        val configs = hashMapOf<String, ConfigValue<*>>()
+        for (c in cmd.config) {
+            configs[c.name] = c.register(b)
+        }
+        val v = CommandConfig(
+            b.comment("Description for /${cmd.name}").define("description", cmd.defaultDescription),
+            configs
+        )
+        b.pop()
+        v
+    }
+
+    init {
+        b.pop()
     }
 
     init {

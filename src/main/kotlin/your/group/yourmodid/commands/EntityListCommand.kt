@@ -68,10 +68,16 @@ object EntityListCommand : AdminCommand("entitylist", "List entities") {
         }
     }
 
+    private val entityTypeDescription by config(
+        "entityTypeDescription",
+        "The entity type to get a list of, if the entity is not found, it might be replaced with pig",
+        "The description for the entity type option"
+    )
+
     override fun ChatInputCreateBuilder.register() {
         string(
             entityTypeOption,
-            "The entity type to get a list of, if the entity is not found, it might be replaced with pig"
+            entityTypeDescription
         ) {
             required = true
         }

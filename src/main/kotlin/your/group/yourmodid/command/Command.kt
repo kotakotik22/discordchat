@@ -3,8 +3,44 @@ package your.group.yourmodid.command
 import dev.kord.core.event.interaction.GuildChatInputCommandInteractionCreateEvent
 import dev.kord.rest.builder.interaction.ChatInputCreateBuilder
 import dev.kord.rest.builder.interaction.GuildMultiApplicationCommandBuilder
+import net.minecraftforge.common.ForgeConfigSpec
+import net.minecraftforge.common.ForgeConfigSpec.ConfigValue
+import your.group.yourmodid.Config
+import kotlin.properties.ReadOnlyProperty
+import kotlin.reflect.KProperty
 
-abstract class Command(val name: String, val description: String) {
+sealed interface CommandConfig<T : Any> : ReadOnlyProperty<Any?, T> {
+    val commandName: String
+
+    val default: T
+    val comments: Array<out String>
+    val name: String
+
+    fun register(b: ForgeConfigSpec.Builder): ConfigValue<T>
+    fun castValue(v: Any): T
+
+    override fun getValue(thisRef: Any?, property: KProperty<*>): T =
+        castValue(Config.commandConfigs[commandName]!!.configs[name]!!.get())
+
+    class StringCommandConfig(
+        override val default: String, override val comments: Array<out String>, override val name: String,
+        override val commandName: String
+    ) : CommandConfig<String> {
+        override fun register(b: ForgeConfigSpec.Builder): ConfigValue<String> =
+            b.comment(*comments).define(name, default)
+
+        override fun castValue(v: Any): String =
+            v as String
+    }
+}
+
+abstract class Command(val name: String, val defaultDescription: String) {
+    val config = arrayListOf<CommandConfig<*>>()
+    protected fun config(name: String, default: String, vararg comments: String) =
+        CommandConfig.StringCommandConfig(default, comments, name, this.name).also {
+            config.add(it)
+        }
+
     protected abstract suspend fun GuildChatInputCommandInteractionCreateEvent.execute()
 
     @JvmName("registerNoReceiver")
@@ -13,7 +49,7 @@ abstract class Command(val name: String, val description: String) {
 
     protected open fun ChatInputCreateBuilder.register() {}
     fun register(b: GuildMultiApplicationCommandBuilder) =
-        b.input(name, description) {
+        b.input(name, Config.commandConfigs[name]?.description ?: defaultDescription) {
             register()
         }
 }
