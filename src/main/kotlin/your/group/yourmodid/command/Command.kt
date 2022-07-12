@@ -9,24 +9,22 @@ import your.group.yourmodid.Config
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
-sealed interface CommandConfig<T : Any> : ReadOnlyProperty<Any?, T> {
-    val commandName: String
+sealed class CommandConfig<T : Any>(
+    val commandName: String, val default: T, val comments: Array<out String>,
+    val name: String, val category: String?
+) : ReadOnlyProperty<Any?, T> {
 
-    val default: T
-    val comments: Array<out String>
-    val name: String
-    val category: String?
+    abstract fun register(b: ForgeConfigSpec.Builder): ConfigValue<T>
+    abstract fun castValue(v: Any): T
 
-    fun register(b: ForgeConfigSpec.Builder): ConfigValue<T>
-    fun castValue(v: Any): T
+    private val configValue by lazy { Config.commandConfigs[commandName]?.get(name) ?: error("Config not built yet") }
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): T =
-        castValue(Config.commandConfigs[commandName]!![name]!!.get())
+        castValue(configValue.get())
 
     class StringCommandConfig(
-        override val default: String, override val comments: Array<out String>, override val name: String,
-        override val commandName: String, override val category: String?
-    ) : CommandConfig<String> {
+        commandName: String, default: String, comments: Array<out String>, name: String, category: String?
+    ) : CommandConfig<String>(commandName, default, comments, name, category) {
         override fun register(b: ForgeConfigSpec.Builder): ConfigValue<String> =
             b.comment(*comments).define(name, default)
 
@@ -35,12 +33,8 @@ sealed interface CommandConfig<T : Any> : ReadOnlyProperty<Any?, T> {
     }
 
     class IntCommandConfig(
-        override val commandName: String,
-        override val default: Int,
-        override val comments: Array<out String>,
-        override val name: String,
-        override val category: String?
-    ) : CommandConfig<Int> {
+        commandName: String, default: Int, comments: Array<out String>, name: String, category: String?
+    ) : CommandConfig<Int>(commandName, default, comments, name, category) {
         override fun register(b: ForgeConfigSpec.Builder): ConfigValue<Int> =
             b.comment(*comments).define(name, default)
 
@@ -49,12 +43,8 @@ sealed interface CommandConfig<T : Any> : ReadOnlyProperty<Any?, T> {
     }
 
     class BoolCommandConfig(
-        override val commandName: String,
-        override val default: Boolean,
-        override val comments: Array<out String>,
-        override val name: String,
-        override val category: String?
-    ) : CommandConfig<Boolean> {
+        commandName: String, default: Boolean, comments: Array<out String>, name: String, category: String?
+    ) : CommandConfig<Boolean>(commandName, default, comments, name, category) {
         override fun register(b: ForgeConfigSpec.Builder): ConfigValue<Boolean> =
             b.comment(*comments).define(name, default)
 
@@ -66,7 +56,7 @@ sealed interface CommandConfig<T : Any> : ReadOnlyProperty<Any?, T> {
 abstract class Command(val name: String, defaultDescription: String) {
     val config = arrayListOf<CommandConfig<*>>()
     protected fun config(name: String, default: String, vararg comments: String, category: String? = null) =
-        CommandConfig.StringCommandConfig(default, comments, name, this.name, category).also {
+        CommandConfig.StringCommandConfig(this.name, default, comments, name, category).also {
             config.add(it)
         }
 
