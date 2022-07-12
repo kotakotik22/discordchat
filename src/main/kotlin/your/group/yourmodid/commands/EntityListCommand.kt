@@ -74,13 +74,14 @@ object EntityListCommand : AdminCommand("entitylist", "List entities") {
         "The description for the entity type option"
     )
 
-    override fun ChatInputCreateBuilder.register() {
-        string(
-            entityTypeOption,
-            entityTypeDescription
+    override fun register(builder: ChatInputCreateBuilder) {
+        builder.string(
+            this.entityTypeOption,
+            this.entityTypeDescription
         ) {
-            required = true
+            this.required = true
         }
+        super.register(builder)
     }
 }
 

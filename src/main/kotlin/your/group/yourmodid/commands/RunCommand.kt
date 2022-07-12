@@ -64,10 +64,11 @@ object RunCommand : AdminCommand("run", "Run the provided command") {
         }
     }
 
-    override fun ChatInputCreateBuilder.register() {
-        string("command", "The command to execute") {
-            required = true
+    override fun register(builder: ChatInputCreateBuilder) {
+        builder.string("command", "The command to execute") {
+            this.required = true
         }
+        super.register(builder)
     }
 }
 

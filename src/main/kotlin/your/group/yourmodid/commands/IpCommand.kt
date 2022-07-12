@@ -24,7 +24,8 @@ object IpCommand : Command("ip", "Tells you the server IP") {
         }
     }
 
-    override fun ChatInputCreateBuilder.register() {
+    override fun register(builder: ChatInputCreateBuilder) {
         ip
+        super.register(builder)
     }
 }

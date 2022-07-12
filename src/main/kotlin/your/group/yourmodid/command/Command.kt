@@ -89,9 +89,9 @@ abstract class Command(val name: String, val defaultDescription: String) {
     suspend fun execute(event: GuildChatInputCommandInteractionCreateEvent) =
         event.execute()
 
-    protected open fun ChatInputCreateBuilder.register() {}
+    protected open fun register(builder: ChatInputCreateBuilder) {}
     fun register(b: GuildMultiApplicationCommandBuilder) =
         b.input(name, Config.commandConfigs[name]?.description ?: defaultDescription) {
-            register()
+            register(this)
         }
 }
