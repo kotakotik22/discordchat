@@ -21,7 +21,7 @@ sealed interface CommandConfig<T : Any> : ReadOnlyProperty<Any?, T> {
     fun castValue(v: Any): T
 
     override fun getValue(thisRef: Any?, property: KProperty<*>): T =
-        castValue(Config.commandConfigs[commandName]!!.configs[name]!!.get())
+        castValue(Config.commandConfigs[commandName]!![name]!!.get())
 
     class StringCommandConfig(
         override val default: String, override val comments: Array<out String>, override val name: String,
@@ -63,7 +63,7 @@ sealed interface CommandConfig<T : Any> : ReadOnlyProperty<Any?, T> {
     }
 }
 
-abstract class Command(val name: String, val defaultDescription: String) {
+abstract class Command(val name: String, defaultDescription: String) {
     val config = arrayListOf<CommandConfig<*>>()
     protected fun config(name: String, default: String, vararg comments: String, category: String? = null) =
         CommandConfig.StringCommandConfig(default, comments, name, this.name, category).also {
@@ -89,9 +89,18 @@ abstract class Command(val name: String, val defaultDescription: String) {
     suspend fun execute(event: GuildChatInputCommandInteractionCreateEvent) =
         event.execute()
 
+    val description by messageConfig("description", defaultDescription, "Description for this command")
+    val enabled by config("enabled", true, "Whether this command is enabled")
+
     protected open fun register(builder: ChatInputCreateBuilder) {}
     fun register(b: GuildMultiApplicationCommandBuilder) =
-        b.input(name, Config.commandConfigs[name]?.description ?: defaultDescription) {
+        b.input(name, description) {
             register(this)
         }
+
+    open fun reasonForNotRegistering() =
+        "Command disabled in config".takeUnless { enabled }
+
+    override fun toString(): String =
+        "/$name"
 }

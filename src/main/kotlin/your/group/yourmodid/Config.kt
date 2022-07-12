@@ -81,13 +81,6 @@ object Config {
         b.push("commands")
     }
 
-    class CommandConfig(
-        description: ForgeConfigSpec.ConfigValue<String>,
-        val configs: HashMap<String, ForgeConfigSpec.ConfigValue<*>>
-    ) {
-        val description by description
-    }
-
     val commandConfigs = discordCommands.mapValues { (_, cmd) ->
         b.comment("Settings for /${cmd.name}").push(cmd.name)
         val configs = hashMapOf<String, ConfigValue<*>>()
@@ -102,12 +95,8 @@ object Config {
                 b.pop()
             }
         }
-        val v = CommandConfig(
-            b.comment("Description for /${cmd.name}").define("description", cmd.defaultDescription),
-            configs
-        )
         b.pop()
-        v
+        configs
     }
 
     init {

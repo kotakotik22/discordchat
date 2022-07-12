@@ -27,7 +27,10 @@ suspend fun setUpCommands(guild: Snowflake, kord: Kord) {
     }
     kord.createGuildApplicationCommands(guild) {
         for (command in discordCommands.values) {
-            command.register(this)
+            val r = command.reasonForNotRegistering()
+            if (r == null)
+                command.register(this)
+            else logger.info("Not registering $command for reason: $r")
         }
     }
 }
