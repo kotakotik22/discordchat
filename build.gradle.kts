@@ -63,8 +63,7 @@ kotlin.sourceSets.all {
 minecraft.apply {
     // Change to your preferred mappings
     mappings("official", mappings_version)
-    // Add your AccessTransformer
-    // accessTransformer = file("src/main/resources/META-INF/accesstransformer.cfg")
+    accessTransformer(file("src/main/resources/META-INF/accesstransformer.cfg"))
 
     runs {
         val default = RunConfig(project, "default").apply {

@@ -15,7 +15,8 @@ val discordCommands =
         CtLogCommand,
         EntityListCommand,
         IpCommand,
-        TpsCommand
+        TpsCommand,
+        RunCommand
     )
         .associateBy { it.name }
 
