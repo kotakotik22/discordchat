@@ -22,9 +22,14 @@ object EntityListCommand : AdminCommand("entitylist", "List entities") {
     override suspend fun GuildChatInputCommandInteractionCreateEvent.execute() {
         val response = deferEphemeralResponseAsync()
         val typeName = interaction.command.strings[entityTypeOption]!!
+        val loc = ResourceLocation.tryParse(typeName)
+        if (!ForgeRegistries.ENTITIES.containsKey(loc)) {
+            response.respond("Could not find entity type $loc")
+            return
+        }
         val type =
-            ForgeRegistries.ENTITIES.getValue(ResourceLocation.tryParse(typeName))
-                ?: return response.respond("Could not find entity type $typeName").void()
+            ForgeRegistries.ENTITIES.getValue(loc)
+                ?: return response.respond("Could not get entity type $loc").void()
 
         val embed = createEmbed {
             title = "Entities"
@@ -70,7 +75,7 @@ object EntityListCommand : AdminCommand("entitylist", "List entities") {
 
     private val entityTypeDescription by config(
         "entityTypeDescription",
-        "The entity type to get a list of, if the entity is not found, it might be replaced with pig",
+        "The entity type to get a list of",
         "The description for the entity type option"
     )
 
