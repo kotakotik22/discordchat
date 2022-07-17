@@ -9,7 +9,7 @@ import your.group.yourmodid.commands.*
 val discordCommands =
     listOf(
         ListCommand,
-        WhitelistMessageCommand,
+        CreateMessageCommand,
         LatestCommand,
         LogCommand,
         CtLogCommand,
