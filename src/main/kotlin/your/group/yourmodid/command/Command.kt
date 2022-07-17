@@ -53,7 +53,7 @@ sealed class CommandConfig<T : Any>(
     }
 }
 
-abstract class Command(val name: String, defaultDescription: String) {
+abstract class Command(val name: String, val description: String) {
     val config = arrayListOf<CommandConfig<*>>()
     protected fun config(name: String, default: String, vararg comments: String, category: String? = null) =
         CommandConfig.StringCommandConfig(this.name, default, comments, name, category).also {
@@ -79,7 +79,6 @@ abstract class Command(val name: String, defaultDescription: String) {
     suspend fun execute(event: GuildChatInputCommandInteractionCreateEvent) =
         event.execute()
 
-    val description by messageConfig("description", defaultDescription, "Description for this command")
     val enabled by config("enabled", true, "Whether this command is enabled")
 
     protected open fun register(builder: ChatInputCreateBuilder) {}

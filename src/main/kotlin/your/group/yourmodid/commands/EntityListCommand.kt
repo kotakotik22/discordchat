@@ -16,8 +16,8 @@ import your.group.yourmodid.server
 import your.group.yourmodid.void
 import kotlin.math.roundToInt
 
-object EntityListCommand : AdminCommand("entitylist", "List entities") {
-    const val entityTypeOption = "entitytype"
+object EntityListCommand : AdminCommand("entity_list", "List entities") {
+    const val entityTypeOption = "entity_type"
 
     override suspend fun GuildChatInputCommandInteractionCreateEvent.execute() {
         val response = deferEphemeralResponseAsync()
@@ -73,18 +73,12 @@ object EntityListCommand : AdminCommand("entitylist", "List entities") {
         }
     }
 
-    private val entityTypeDescription by config(
-        "entityTypeDescription",
-        "The entity type to get a list of",
-        "The description for the entity type option"
-    )
-
     override fun register(builder: ChatInputCreateBuilder) {
         builder.string(
             this.entityTypeOption,
-            this.entityTypeDescription
+            "The entity type to get a list of"
         ) {
-            this.required = true
+            required = true
         }
         super.register(builder)
     }

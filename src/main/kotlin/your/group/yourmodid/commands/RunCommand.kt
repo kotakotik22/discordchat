@@ -1,5 +1,6 @@
 package your.group.yourmodid.commands
 
+import dev.kord.core.entity.User
 import dev.kord.core.event.interaction.GuildChatInputCommandInteractionCreateEvent
 import dev.kord.rest.builder.interaction.ChatInputCreateBuilder
 import dev.kord.rest.builder.interaction.string
@@ -19,12 +20,6 @@ object RunCommand : AdminCommand("run", "Run the provided command") {
         2,
         "The permission level that the commands will be ran at",
         "This permission level is global so anyone that can use this command can execute commands at this permission level"
-    )
-    private val sourceName by messageConfig(
-        "sourceName",
-        "Discord message sender (%s/%s)",
-        "The source name",
-        "Will appear when informing admins"
     )
     private val informAdmins by config("informAdmins", true, "Whether to inform admins whenever this command is used")
 
@@ -52,9 +47,7 @@ object RunCommand : AdminCommand("run", "Run the provided command") {
 
                 })
                 .withName(
-                    sourceName.format(
-                        interaction.user.id,
-                        interaction.user.run { "$username#$discriminator" })
+                    "Discord message sender (${interaction.user.id}/${interaction.user.discriminatedUsername})"
                 )
                 .withPermission(permissionLevel), command
         )
@@ -71,6 +64,8 @@ object RunCommand : AdminCommand("run", "Run the provided command") {
         super.register(builder)
     }
 }
+
+val User.discriminatedUsername get() = "$username#$discriminator"
 
 fun CommandSourceStack.withName(textName: String, displayName: Component = TextComponent(textName)) =
     CommandSourceStack(
