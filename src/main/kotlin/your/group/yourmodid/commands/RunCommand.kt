@@ -8,7 +8,7 @@ import net.minecraft.commands.CommandSourceStack
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.TextComponent
 import your.group.yourmodid.command.AdminCommand
-import your.group.yourmodid.deferEpheremalResponseAsync
+import your.group.yourmodid.deferEphemeralResponseAsync
 import your.group.yourmodid.respond
 import your.group.yourmodid.server
 import java.util.*
@@ -29,7 +29,7 @@ object RunCommand : AdminCommand("run", "Run the provided command") {
     private val informAdmins by config("informAdmins", true, "Whether to inform admins whenever this command is used")
 
     override suspend fun GuildChatInputCommandInteractionCreateEvent.execute() {
-        val response = deferEpheremalResponseAsync()
+        val response = deferEphemeralResponseAsync()
 
         val command = interaction.command.strings["command"]!!
         var str = "> ${command}\n\n"

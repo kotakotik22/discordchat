@@ -143,19 +143,19 @@ fun checkLegalFromMinecraft(plr: ServerPlayer, str: String, message: Boolean = t
         plr.sendServerMessage(TextComponent(it))
     }
 
-fun Any?.void() {}
+fun @Suppress("unused") Any?.void() {}
 
-val <T> Optional<T>.nullable get() = if (isPresent) get() else null
+inline val <T> Optional<T>.nullable get() = if (isPresent) get() else null
 
 suspend inline fun Deferred<DeferredEphemeralMessageInteractionResponseBehavior>.respond(builder: InteractionResponseModifyBuilder.() -> Unit) =
     await().respond {
         builder()
     }
 
-suspend fun Deferred<DeferredEphemeralMessageInteractionResponseBehavior>.respond(msgContent: String) =
+suspend inline fun Deferred<DeferredEphemeralMessageInteractionResponseBehavior>.respond(msgContent: String) =
     respond {
         content = msgContent
     }
 
-fun <T> T.deferEpheremalResponseAsync() where T : CoroutineScope, T : ApplicationCommandInteractionCreateEvent =
+fun <T> T.deferEphemeralResponseAsync() where T : CoroutineScope, T : ApplicationCommandInteractionCreateEvent =
     async { interaction.deferEphemeralResponse() }

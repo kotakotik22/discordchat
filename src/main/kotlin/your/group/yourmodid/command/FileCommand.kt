@@ -3,7 +3,7 @@ package your.group.yourmodid.command
 import dev.kord.core.event.interaction.GuildChatInputCommandInteractionCreateEvent
 import dev.kord.rest.NamedFile
 import dev.kord.rest.builder.message.create.UserMessageCreateBuilder
-import your.group.yourmodid.deferEpheremalResponseAsync
+import your.group.yourmodid.deferEphemeralResponseAsync
 import your.group.yourmodid.respond
 import java.io.File
 import java.io.IOException
@@ -16,7 +16,7 @@ abstract class FileCommand(name: String, description: String) : AdminCommand(nam
     abstract suspend fun getFile(): File?
 
     override suspend fun GuildChatInputCommandInteractionCreateEvent.execute() {
-        val response = deferEpheremalResponseAsync()
+        val response = deferEphemeralResponseAsync()
 
         try {
             getFile()?.let {

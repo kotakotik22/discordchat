@@ -10,7 +10,7 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraftforge.registries.ForgeRegistries
 import org.apache.commons.io.IOUtils
 import your.group.yourmodid.command.AdminCommand
-import your.group.yourmodid.deferEpheremalResponseAsync
+import your.group.yourmodid.deferEphemeralResponseAsync
 import your.group.yourmodid.respond
 import your.group.yourmodid.server
 import your.group.yourmodid.void
@@ -20,7 +20,7 @@ object EntityListCommand : AdminCommand("entitylist", "List entities") {
     const val entityTypeOption = "entitytype"
 
     override suspend fun GuildChatInputCommandInteractionCreateEvent.execute() {
-        val response = deferEpheremalResponseAsync()
+        val response = deferEphemeralResponseAsync()
         val typeName = interaction.command.strings[entityTypeOption]!!
         val type =
             ForgeRegistries.ENTITIES.getValue(ResourceLocation.tryParse(typeName))

@@ -9,7 +9,7 @@ import dev.kord.rest.builder.interaction.ChatInputCreateBuilder
 import dev.kord.rest.builder.interaction.string
 import dev.kord.rest.builder.message.create.actionRow
 import your.group.yourmodid.command.AdminCommand
-import your.group.yourmodid.deferEpheremalResponseAsync
+import your.group.yourmodid.deferEphemeralResponseAsync
 import your.group.yourmodid.respond
 import your.group.yourmodid.void
 import your.group.yourmodid.whitelistButtonId
@@ -33,7 +33,7 @@ object CreateMessageCommand :
         val m = messages[interaction.command.strings["message"]] ?: return interaction.respondEphemeral {
             content = "Unexpected message option"
         }.void()
-        val response = deferEpheremalResponseAsync()
+        val response = deferEphemeralResponseAsync()
         m(interaction.channel)
         response.respond("Message created")
     }
