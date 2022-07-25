@@ -36,7 +36,7 @@ internal inline fun notInitializing(reason: String) =
 
 // for some reason when this object is being compiled to a java class and kotlinforforge is not recognizing it correctly, so im gonna make this a class
 @Mod(modId)
-class YourMod {
+class DiscordChat {
     @Mod.EventBusSubscriber
     object Events {
         @SubscribeEvent
