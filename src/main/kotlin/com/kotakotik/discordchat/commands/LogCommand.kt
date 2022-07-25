@@ -1,10 +1,10 @@
-package your.group.yourmodid.commands
+package com.kotakotik.discordchat.commands
 
+import com.kotakotik.discordchat.command.FileCommand
+import com.kotakotik.discordchat.nullable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.minecraftforge.fml.loading.FMLPaths
-import your.group.yourmodid.command.FileCommand
-import your.group.yourmodid.nullable
 import java.io.File
 import java.nio.file.FileSystems
 import java.nio.file.Files

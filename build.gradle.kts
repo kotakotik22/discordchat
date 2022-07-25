@@ -29,7 +29,7 @@ plugins {
 //apply(plugin = "kotlin")
 //apply(plugin = "kotlinx-serialization")
 
-val modid = "yourmodid"
+val modid = "kotas_discordchat"
 
 val mod_version: String by project
 val mappings_version: String by project
@@ -43,7 +43,7 @@ val spark_file: String by project
 apply(from = "https://raw.githubusercontent.com/thedarkcolour/KotlinForForge/site/thedarkcolour/kotlinforforge/gradle/kff-3.1.0.gradle")
 
 version = mod_version
-group = "your.group.$modid"
+group = "com.kotakotik.discordchat"
 
 java.toolchain.languageVersion.set(JavaLanguageVersion.of(17))
 //kotlin.jvmToolchain {}

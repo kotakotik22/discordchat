@@ -6,23 +6,23 @@ loaderVersion = "[3,)" # Require at least 3.x
 license = 'MIT'
 
 [[mods]]
-modId = "yourmodid"
+modId = "kotas_discordchat"
 version = "${file.jarVersion}"
-displayName = "your mod name"
-credits = ""
-authors = "you"
+displayName = "Kota's Discord chat"
+credits = "Grimmauld"
+authors = "kotakotik22"
 description = '''
-Example mod that uses Kotlin for Forge.
+A server-side mod that links Discord and Minecraft
 '''
-[[dependencies.yourmodid]]
+[[dependencies.kotas_discordchat]]
 modId = "forge"
 mandatory = true
 versionRange = "[39,)"
 ordering = "NONE"
 side = "BOTH"
-[[dependencies.yourmodid]]
+[[dependencies.kotas_discordchat]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.18.1]"
+versionRange = "[1.18.1,1.19)"
 ordering = "NONE"
 side = "BOTH"

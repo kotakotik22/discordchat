@@ -1,5 +1,9 @@
-package your.group.yourmodid.commands
+package com.kotakotik.discordchat.commands
 
+import com.kotakotik.discordchat.command.AdminCommand
+import com.kotakotik.discordchat.deferEphemeralResponseAsync
+import com.kotakotik.discordchat.respond
+import com.kotakotik.discordchat.server
 import dev.kord.core.entity.User
 import dev.kord.core.event.interaction.GuildChatInputCommandInteractionCreateEvent
 import dev.kord.rest.builder.interaction.ChatInputCreateBuilder
@@ -8,10 +12,6 @@ import net.minecraft.commands.CommandSource
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.TextComponent
-import your.group.yourmodid.command.AdminCommand
-import your.group.yourmodid.deferEphemeralResponseAsync
-import your.group.yourmodid.respond
-import your.group.yourmodid.server
 import java.util.*
 
 object RunCommand : AdminCommand("run", "Run the provided command") {

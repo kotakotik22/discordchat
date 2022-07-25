@@ -1,4 +1,4 @@
-package your.group.yourmodid
+package com.kotakotik.discordchat
 
 import net.minecraftforge.common.ForgeConfigSpec
 import net.minecraftforge.common.ForgeConfigSpec.Builder
@@ -104,7 +104,7 @@ object Config {
     }
 
     init {
-        registerConfig(ModConfig.Type.COMMON, b.build(), "${modId}-common.toml")
+        registerConfig(ModConfig.Type.COMMON, b.build(), "$modId-common.toml")
     }
 }
 

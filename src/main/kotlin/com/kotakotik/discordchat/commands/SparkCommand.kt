@@ -1,5 +1,8 @@
-package your.group.yourmodid.commands
+package com.kotakotik.discordchat.commands
 
+import com.kotakotik.discordchat.OptionalDependency
+import com.kotakotik.discordchat.command.AdminCommand
+import com.kotakotik.discordchat.server
 import dev.kord.core.behavior.interaction.respondEphemeral
 import dev.kord.core.behavior.interaction.response.edit
 import dev.kord.core.event.interaction.GuildChatInputCommandInteractionCreateEvent
@@ -10,9 +13,6 @@ import kotlinx.coroutines.delay
 import kotlinx.datetime.Clock
 import net.minecraft.commands.CommandSource
 import net.minecraft.network.chat.Component
-import your.group.yourmodid.OptionalDependency
-import your.group.yourmodid.command.AdminCommand
-import your.group.yourmodid.server
 import java.util.*
 
 object SparkCommand : AdminCommand("spark", "Launches a spark profiler") {

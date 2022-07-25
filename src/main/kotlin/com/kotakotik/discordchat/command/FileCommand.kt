@@ -1,10 +1,10 @@
-package your.group.yourmodid.command
+package com.kotakotik.discordchat.command
 
+import com.kotakotik.discordchat.deferEphemeralResponseAsync
+import com.kotakotik.discordchat.respond
 import dev.kord.core.event.interaction.GuildChatInputCommandInteractionCreateEvent
 import dev.kord.rest.NamedFile
 import dev.kord.rest.builder.message.create.UserMessageCreateBuilder
-import your.group.yourmodid.deferEphemeralResponseAsync
-import your.group.yourmodid.respond
 import java.io.File
 import java.io.IOException
 

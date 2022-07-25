@@ -1,4 +1,4 @@
-package your.group.yourmodid.command
+package com.kotakotik.discordchat.command
 
 import dev.kord.rest.builder.interaction.ChatInputCreateBuilder
 

@@ -1,5 +1,10 @@
-package your.group.yourmodid.commands
+package com.kotakotik.discordchat.commands
 
+import com.kotakotik.discordchat.command.AdminCommand
+import com.kotakotik.discordchat.deferEphemeralResponseAsync
+import com.kotakotik.discordchat.respond
+import com.kotakotik.discordchat.void
+import com.kotakotik.discordchat.whitelistButtonId
 import dev.kord.common.entity.ButtonStyle
 import dev.kord.core.behavior.channel.GuildMessageChannelBehavior
 import dev.kord.core.behavior.channel.createMessage
@@ -8,11 +13,6 @@ import dev.kord.core.event.interaction.GuildChatInputCommandInteractionCreateEve
 import dev.kord.rest.builder.interaction.ChatInputCreateBuilder
 import dev.kord.rest.builder.interaction.string
 import dev.kord.rest.builder.message.create.actionRow
-import your.group.yourmodid.command.AdminCommand
-import your.group.yourmodid.deferEphemeralResponseAsync
-import your.group.yourmodid.respond
-import your.group.yourmodid.void
-import your.group.yourmodid.whitelistButtonId
 
 object CreateMessageCommand :
     AdminCommand("create_message", "Creates the chosen message") {

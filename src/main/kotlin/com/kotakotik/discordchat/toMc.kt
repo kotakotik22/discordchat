@@ -1,4 +1,4 @@
-package your.group.yourmodid
+package com.kotakotik.discordchat
 
 import dev.kord.core.entity.Message
 import dev.kord.core.entity.Webhook

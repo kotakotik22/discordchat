@@ -1,11 +1,11 @@
-package your.group.yourmodid.commands
+package com.kotakotik.discordchat.commands
 
+import com.kotakotik.discordchat.command.Command
+import com.kotakotik.discordchat.server
 import dev.kord.common.Color
 import dev.kord.core.behavior.interaction.respondEphemeral
 import dev.kord.core.event.interaction.GuildChatInputCommandInteractionCreateEvent
 import dev.kord.rest.builder.message.create.embed
-import your.group.yourmodid.command.Command
-import your.group.yourmodid.server
 import java.text.DecimalFormat
 import kotlin.math.min
 

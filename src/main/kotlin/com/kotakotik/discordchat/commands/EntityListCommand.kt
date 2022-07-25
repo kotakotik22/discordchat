@@ -1,5 +1,10 @@
-package your.group.yourmodid.commands
+package com.kotakotik.discordchat.commands
 
+import com.kotakotik.discordchat.command.AdminCommand
+import com.kotakotik.discordchat.deferEphemeralResponseAsync
+import com.kotakotik.discordchat.respond
+import com.kotakotik.discordchat.server
+import com.kotakotik.discordchat.void
 import dev.kord.common.Color
 import dev.kord.core.event.interaction.GuildChatInputCommandInteractionCreateEvent
 import dev.kord.rest.builder.interaction.ChatInputCreateBuilder
@@ -9,11 +14,6 @@ import dev.kord.rest.builder.message.modify.MessageModifyBuilder
 import net.minecraft.resources.ResourceLocation
 import net.minecraftforge.registries.ForgeRegistries
 import org.apache.commons.io.IOUtils
-import your.group.yourmodid.command.AdminCommand
-import your.group.yourmodid.deferEphemeralResponseAsync
-import your.group.yourmodid.respond
-import your.group.yourmodid.server
-import your.group.yourmodid.void
 import kotlin.math.roundToInt
 
 object EntityListCommand : AdminCommand("entity_list", "List entities") {
@@ -75,7 +75,7 @@ object EntityListCommand : AdminCommand("entity_list", "List entities") {
 
     override fun register(builder: ChatInputCreateBuilder) {
         builder.string(
-            this.entityTypeOption,
+            entityTypeOption,
             "The entity type to get a list of"
         ) {
             required = true

@@ -1,10 +1,10 @@
-package your.group.yourmodid.commands
+package com.kotakotik.discordchat.commands
 
+import com.kotakotik.discordchat.command.Command
+import com.kotakotik.discordchat.server
 import dev.kord.core.behavior.interaction.respondEphemeral
 import dev.kord.core.event.interaction.GuildChatInputCommandInteractionCreateEvent
 import dev.kord.rest.builder.interaction.ChatInputCreateBuilder
-import your.group.yourmodid.command.Command
-import your.group.yourmodid.server
 import java.net.InetAddress
 
 object IpCommand : Command("ip", "Tells you the server IP") {

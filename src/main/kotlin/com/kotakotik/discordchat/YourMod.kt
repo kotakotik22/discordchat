@@ -1,4 +1,4 @@
-package your.group.yourmodid
+package com.kotakotik.discordchat
 
 import dev.kord.core.behavior.interaction.response.DeferredEphemeralMessageInteractionResponseBehavior
 import dev.kord.core.behavior.interaction.response.respond

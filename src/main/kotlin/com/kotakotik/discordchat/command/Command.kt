@@ -1,12 +1,12 @@
-package your.group.yourmodid.command
+package com.kotakotik.discordchat.command
 
+import com.kotakotik.discordchat.Config
+import com.kotakotik.discordchat.OptionalDependency
 import dev.kord.core.event.interaction.GuildChatInputCommandInteractionCreateEvent
 import dev.kord.rest.builder.interaction.ChatInputCreateBuilder
 import dev.kord.rest.builder.interaction.GuildMultiApplicationCommandBuilder
 import net.minecraftforge.common.ForgeConfigSpec
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue
-import your.group.yourmodid.Config
-import your.group.yourmodid.OptionalDependency
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 

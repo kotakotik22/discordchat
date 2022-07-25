@@ -1,7 +1,7 @@
-package your.group.yourmodid.commands
+package com.kotakotik.discordchat.commands
 
+import com.kotakotik.discordchat.command.FileCommand
 import net.minecraftforge.fml.loading.FMLPaths
-import your.group.yourmodid.command.FileCommand
 import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths

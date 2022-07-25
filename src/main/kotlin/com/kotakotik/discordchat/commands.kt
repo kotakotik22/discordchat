@@ -1,10 +1,10 @@
-package your.group.yourmodid
+package com.kotakotik.discordchat
 
+import com.kotakotik.discordchat.commands.*
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.Kord
 import dev.kord.core.event.interaction.GuildChatInputCommandInteractionCreateEvent
 import dev.kord.core.on
-import your.group.yourmodid.commands.*
 
 val discordCommands =
     listOf(
