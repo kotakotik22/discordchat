@@ -45,6 +45,9 @@ class YourMod {
                 return notInitializing("Not on dedicated server")
             logger.info("Initializing Discord chat")
             server = event.server
+            val depLogger = logger("dependencies")
+            for (dep in OptionalDependency.values())
+                depLogger.debug("${dep.modid} loaded: ${dep.refreshPresent()}")
 
             FORGE_BUS.register(DedicatedServerEvents)
             logInDiscord()
@@ -109,6 +112,9 @@ internal fun loc(id: String) = ResourceLocation(modId, id)
 
 // get minecraft client, will crash on server!
 internal inline val minecraft get() = Minecraft.getInstance()
+
+internal fun logger(suffix: String?) =
+    LogManager.getLogger(suffix?.let { "$modId/$it" } ?: modId)
 
 // get your mod's logger
 internal inline val logger get() = LogManager.getLogger(modId)

@@ -6,6 +6,7 @@ import dev.kord.rest.builder.interaction.GuildMultiApplicationCommandBuilder
 import net.minecraftforge.common.ForgeConfigSpec
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue
 import your.group.yourmodid.Config
+import your.group.yourmodid.OptionalDependency
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
@@ -86,6 +87,9 @@ abstract class Command(val name: String, val description: String) {
         b.input(name, description) {
             register(this)
         }
+
+    protected fun requiresDep(dep: OptionalDependency) =
+        "Could not find required dependency ${dep.modid}".takeUnless { dep.present }
 
     open fun reasonForNotRegistering() =
         "Command disabled in config".takeUnless { enabled }

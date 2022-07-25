@@ -16,14 +16,24 @@ val discordCommands =
         EntityListCommand,
         IpCommand,
         TpsCommand,
-        RunCommand
+        RunCommand,
+        SparkCommand
     )
         .associateBy { it.name }
 
 suspend fun setUpCommands(guild: Snowflake, kord: Kord) {
     kord.on<GuildChatInputCommandInteractionCreateEvent> {
         val c = discordCommands[interaction.invokedCommandName] ?: return@on
-        c.execute(this)
+        try {
+            c.execute(this)
+        } catch (e: Throwable) {
+            logger.error(
+                "Got error while trying to execute command $c for ${interaction.user.discriminatedUsername}: \n\t${
+                    e.stackTraceToString().replace("\n", "\n\t")
+                }"
+            )
+            throw e
+        }
     }
     kord.createGuildApplicationCommands(guild) {
         for (command in discordCommands.values) {

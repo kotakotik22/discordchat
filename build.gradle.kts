@@ -36,6 +36,7 @@ val mappings_version: String by project
 val forge_version: String by project
 val display_name: String by project
 val kord_version: String by project
+val spark_file: String by project
 // devauth
 //val devauth_version: String by project
 
@@ -165,6 +166,12 @@ repositories {
     mavenCentral()
     // devauth
 //    maven { url = uri("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1" )}
+    maven {
+        setUrl("https://cursemaven.com")
+        content {
+            includeGroup("curse.maven")
+        }
+    }
 }
 
 dependencies {
@@ -182,6 +189,7 @@ dependencies {
     add("dev.kord:kord-core:$kord_version") {
         exclude("org.jetbrains", "annotations")
     }
+    runtimeOnly(fg.deobf("curse.maven:spark-361579:$spark_file"))
 }
 
 tasks.withType<Jar> {
