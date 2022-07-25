@@ -16,10 +16,7 @@ import dev.kord.core.event.interaction.ButtonInteractionCreateEvent
 import dev.kord.core.event.interaction.ModalSubmitInteractionCreateEvent
 import dev.kord.core.on
 import dev.kord.rest.builder.message.create.actionRow
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import net.minecraft.server.players.UserWhiteListEntry
 
 // this file is pretty big because it includes modal and button interactions
@@ -31,10 +28,15 @@ const val whitelistAcceptButtonId = "accept-whitelist"
 const val whitelistDenyButtonId = "deny-whitelist"
 const val whitelistDenyModalId = "deny-whitelist-modal"
 const val whitelistDenyInputId = "deny-whitelist-input"
+const val whitelistEverywherePrefix = "!~whitelist_everywhere "
 
 val usernameRegex = Regex("\\S*")
 val dataInMessageRegex =
     Regex(".*ID: (\\d*).*Minecraft username: (${usernameRegex.pattern}).*", RegexOption.DOT_MATCHES_ALL)
+
+fun getGameProfile(username: String) =
+    server.profileCache.get(username).nullable
+
 
 suspend fun setUpWhitelist(kord: Kord) {
     val channel =
@@ -54,7 +56,7 @@ suspend fun setUpWhitelist(kord: Kord) {
             whitelistAcceptButtonId -> {
                 val response = async { interaction.deferEphemeralResponse() }
                 val (_, id, username) = dataInMessageRegex.matchEntire(interaction.message.content)!!.groupValues
-                val gameProfile = server.profileCache.get(username).nullable
+                val gameProfile = getGameProfile(username)
                     ?: return@on response.respond("Could not find profile with username $username").void()
                 val whitelist = server.playerList.whiteList
                 if (!whitelist.isWhiteListed(gameProfile))
@@ -73,6 +75,13 @@ suspend fun setUpWhitelist(kord: Kord) {
                         components = mutableListOf()
                     }
                 }
+                if (Config.WhitelistEverywhere.send)
+                    launch {
+                        val msg = interaction.channel.createMessage(whitelistEverywherePrefix + username)
+                        delay(5000)
+                        msg.delete("Whitelist everywhere messages are automatically deleted after 5 seconds")
+                    }
+
                 response.respond("$username whitelisted")
             }
             whitelistDenyButtonId -> {

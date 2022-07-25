@@ -90,11 +90,10 @@ minecraft.apply {
             workingDirectory(project.file("run/server"))
         }
 
-        // uncomment for a second server task
-//        create("server2") {
-//            parent(server)
-//            workingDirectory(project.file("run/server2"))
-//        }
+        create("server2") {
+            parent(server)
+            workingDirectory(project.file("run/server2"))
+        }
     }
 }
 
@@ -189,6 +188,7 @@ dependencies {
     add("dev.kord:kord-core:$kord_version") {
         // todo: try to exclude serialization and coroutines since kff already includes them
         exclude("org.jetbrains.kotlin")
+        exclude("org.jetbrains", "annotations")
     }
     runtimeOnly(fg.deobf("curse.maven:spark-361579:$spark_file"))
 }

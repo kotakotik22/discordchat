@@ -33,8 +33,25 @@ object Config {
         .define("whitelistDenial", true)
 
     init {
+        WhitelistEverywhere
         Channels
         Messages
+    }
+
+    object WhitelistEverywhere {
+        init {
+            b.comment("Config for the feature that tells other bots with the same whitelist channel to also whitelist a user")
+            b.push("whitelistEverywhere")
+        }
+
+        val send: Boolean by b.comment("Whether to send a whitelist message to other bots")
+            .define("send", true)
+        val accept: Boolean by b.comment("Whether to accept whitelist messages from other bots")
+            .define("accept", true)
+
+        init {
+            b.pop()
+        }
     }
 
     object Channels {
