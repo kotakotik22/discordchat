@@ -111,3 +111,8 @@ suspend inline fun Deferred<DeferredEphemeralMessageInteractionResponseBehavior>
 
 fun <T> T.deferEphemeralResponseAsync() where T : CoroutineScope, T : ApplicationCommandInteractionCreateEvent =
     async { interaction.deferEphemeralResponse() }
+
+inline fun <T> T.applyIf(condition: Boolean, action: T.() -> Unit): T {
+    if (condition) action()
+    return this
+}

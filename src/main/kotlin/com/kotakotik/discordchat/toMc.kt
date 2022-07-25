@@ -1,15 +1,15 @@
 package com.kotakotik.discordchat
 
+import dev.kord.core.entity.Attachment
 import dev.kord.core.entity.Message
 import dev.kord.core.entity.Webhook
 import dev.kord.core.event.message.MessageCreateEvent
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.toList
+import net.minecraft.ChatFormatting
 import net.minecraft.Util
-import net.minecraft.network.chat.ChatType
-import net.minecraft.network.chat.Component
-import net.minecraft.network.chat.Style
-import net.minecraft.network.chat.TextComponent
+import net.minecraft.network.chat.*
+import net.minecraft.network.chat.ClickEvent.Action.OPEN_URL
 import net.minecraft.server.level.ServerPlayer
 
 const val replyChar = '⬐'
@@ -23,7 +23,7 @@ fun createMcMessageForMinecraftMessage(author: String, message: String): Compone
 suspend fun MessageCreateEvent.createMcMessageForDiscordMessage(
     mainWebhook: Webhook,
     message: Message,
-    followReply: Boolean,
+    isPrimary: Boolean,
     sendIllegalMessage: Boolean
 ): Component? {
     if (checkLegalFromDiscord(message.author ?: return null, message.content, sendIllegalMessage))
@@ -37,19 +37,41 @@ suspend fun MessageCreateEvent.createMcMessageForDiscordMessage(
     val authorComponent = TextComponent("[$name]").withStyle(Style.EMPTY.withColor(color))
 
     val messageComponent = TextComponent("").append(authorComponent).append(" ").append(message.content)
-    if (!followReply) return messageComponent
-    message.referencedMessage?.let {
-        val author = it.author
-        val c = (if (author != null) {
-            createMcMessageForDiscordMessage(mainWebhook, it, false, sendIllegalMessage = false)
-        } else if (it.webhookId == mainWebhook.id) {
-            createMcMessageForMinecraftMessage(it.data.author.username, it.content)
-        } else null) ?: return@let
-        return TextComponent("")
-            .append("  $replyChar ")
-            .append(c)
-            .append("\n")
-            .append(messageComponent)
+    if (isPrimary) {
+        fun Attachment.createComponent() =
+            TextComponent(filename).setStyle(
+                Style.EMPTY.withColor(ChatFormatting.BLUE).withClickEvent(
+                    ClickEvent(
+                        OPEN_URL,
+                        url
+                    )
+                ).withHoverEvent(
+                    HoverEvent(
+                        HoverEvent.Action.SHOW_TEXT,
+                        TextComponent(url).setStyle(Style.EMPTY.withColor(ChatFormatting.BLUE))
+                    )
+                )
+            )
+        if (message.attachments.isNotEmpty()) {
+            if (message.content.isNotBlank())
+                messageComponent.append("\n")
+            for (attachment in message.attachments) {
+                messageComponent.append("\n").append(attachment.createComponent())
+            }
+        }
+        message.referencedMessage?.let {
+            val author = it.author
+            val c = (if (author != null) {
+                createMcMessageForDiscordMessage(mainWebhook, it, false, sendIllegalMessage = false)
+            } else if (it.webhookId == mainWebhook.id) {
+                createMcMessageForMinecraftMessage(it.data.author.username, it.content)
+            } else null) ?: return@let
+            return TextComponent("")
+                .append("  $replyChar ")
+                .append(c)
+                .append("\n")
+                .append(messageComponent)
+        }
     }
     return messageComponent
 }
