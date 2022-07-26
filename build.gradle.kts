@@ -146,15 +146,17 @@ tasks {
         configurations.add(shade)
         dependsOn(relocateShadowJar)
         minimize()
-    }
 
-    jar {
-        finalizedBy("reobfJar")
+        finalizedBy("reobfShadowJar")
     }
 
     clean {
         delete(generatedPath)
     }
+}
+
+reobf {
+    create("shadowJar")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
