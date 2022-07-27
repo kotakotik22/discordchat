@@ -188,8 +188,6 @@ dependencies {
     // devauth
 //    runtimeOnly("me.djtheredstoner:DevAuth-forge-latest:${devauth_version}")
     add("dev.kord:kord-core:$kord_version") {
-        // todo: try to exclude serialization and coroutines since kff already includes them
-        exclude("org.jetbrains.kotlin")
         exclude("org.jetbrains", "annotations")
     }
     runtimeOnly(fg.deobf("curse.maven:spark-361579:$spark_file"))

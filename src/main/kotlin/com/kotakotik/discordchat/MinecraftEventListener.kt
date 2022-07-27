@@ -6,10 +6,8 @@ import net.minecraftforge.event.entity.player.PlayerEvent
 import net.minecraftforge.event.server.ServerStartingEvent
 import net.minecraftforge.event.server.ServerStoppingEvent
 import net.minecraftforge.eventbus.api.SubscribeEvent
-import net.minecraftforge.fml.common.Mod
 import thedarkcolour.kotlinforforge.forge.FORGE_BUS
 
-@Mod.EventBusSubscriber
 object MinecraftEventListener {
     @SubscribeEvent
     fun onServerStart(event: ServerStartingEvent) {

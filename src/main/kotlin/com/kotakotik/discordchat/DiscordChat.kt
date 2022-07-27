@@ -20,6 +20,7 @@ import net.minecraftforge.network.NetworkConstants
 import org.apache.commons.lang3.StringUtils
 import org.apache.logging.log4j.LogManager
 import thedarkcolour.kotlinforforge.forge.DIST
+import thedarkcolour.kotlinforforge.forge.FORGE_BUS
 import thedarkcolour.kotlinforforge.forge.LOADING_CONTEXT
 import java.util.*
 
@@ -37,6 +38,7 @@ class DiscordChat {
                 return@run notInitializing("On client")
 
             Config
+            FORGE_BUS.register(MinecraftEventListener)
 
             LOADING_CONTEXT.registerExtensionPoint(
                 DisplayTest::class.java
