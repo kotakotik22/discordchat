@@ -10,7 +10,7 @@ import net.minecraft.ChatFormatting
 import net.minecraft.Util
 import net.minecraft.network.chat.*
 import net.minecraft.network.chat.ClickEvent.Action.OPEN_URL
-import net.minecraft.server.level.ServerPlayer
+import net.minecraft.server.players.PlayerList
 
 const val replyChar = '⬐'
 
@@ -80,11 +80,8 @@ suspend fun MessageCreateEvent.createMcMessage(mainWebhook: Webhook) {
     if (message.author?.isBot != false) return
     val component = createMcMessageForDiscordMessage(mainWebhook, message, true, sendIllegalMessage = true) ?: return
 
-    val players = server.playerList.players
-    for (plr in players) {
-        plr.sendServerMessage(component)
-    }
+    server.playerList.broadcastServerMessage(component)
 }
 
-fun ServerPlayer.sendServerMessage(component: Component) =
-    sendMessage(component, ChatType.SYSTEM, Util.NIL_UUID)
+fun PlayerList.broadcastServerMessage(component: Component) =
+    broadcastMessage(component, ChatType.SYSTEM, Util.NIL_UUID)

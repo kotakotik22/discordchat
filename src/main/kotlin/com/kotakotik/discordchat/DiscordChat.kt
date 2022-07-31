@@ -9,7 +9,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import net.minecraft.SharedConstants
+import net.minecraft.Util
 import net.minecraft.client.Minecraft
+import net.minecraft.network.chat.ChatType
 import net.minecraft.network.chat.TextComponent
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerPlayer
@@ -94,7 +96,7 @@ suspend fun checkLegalFromDiscord(author: User, str: String, message: Boolean = 
 
 fun checkLegalFromMinecraft(plr: ServerPlayer, str: String, message: Boolean = true) =
     checkLegal(str, Platform.Discord, message) {
-        plr.sendServerMessage(TextComponent(it))
+        plr.sendMessage(TextComponent(it), ChatType.SYSTEM, Util.NIL_UUID)
     }
 
 fun @Suppress("unused") Any?.void() {}
