@@ -257,7 +257,7 @@ private fun tokenize(iter: ListIterator<Char>): List<FormatToken> {
                             }
                             '#' ->
                                 FormatToken.ChannelMentionToken(parseId() ?: return@tryGet null)
-                            else -> TODO()
+                            else -> null
                         }
                     }
                     if (token == null)
