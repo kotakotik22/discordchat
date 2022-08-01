@@ -273,5 +273,7 @@ private fun tokenize(iter: ListIterator<Char>): List<FormatToken> {
             appendText()
         }
     }
+
+    flushText()
     return tokens
 }
