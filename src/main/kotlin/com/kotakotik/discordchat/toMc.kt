@@ -4,6 +4,8 @@ import dev.kord.core.entity.Attachment
 import dev.kord.core.entity.Message
 import dev.kord.core.entity.Webhook
 import dev.kord.core.event.message.MessageCreateEvent
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.toList
 import net.minecraft.ChatFormatting
@@ -17,7 +19,20 @@ const val replyChar = '⬐'
 fun createMcMessageForMinecraftMessage(author: String, message: String): Component? {
     if (!isLegal(author) || !isLegal(message))
         return null
-    return TextComponent("[$author] $message")
+    return TextComponent("<$author> $message")
+}
+
+private fun parse(iter: ListIterator<Char>, component: MutableComponent) {
+    var escaping = false
+    for (c in iter) {
+        if (escaping) {
+            escaping = false
+
+        } else {
+            escaping = c == '\\'
+
+        }
+    }
 }
 
 suspend fun MessageCreateEvent.createMcMessageForDiscordMessage(
@@ -36,7 +51,14 @@ suspend fun MessageCreateEvent.createMcMessageForDiscordMessage(
         ?: Int.MAX_VALUE // full white
     val authorComponent = TextComponent("[$name]").withStyle(Style.EMPTY.withColor(color))
 
-    val messageComponent = TextComponent("").append(authorComponent).append(" ").append(message.content)
+    val messageComponent = TextComponent("").append(authorComponent).append(" ")
+    messageComponent.append(
+        discordFormattingToMc(
+            coroutineScope.async(start = CoroutineStart.LAZY) { message.getGuild() },
+            message.content
+        )
+    )
+
     if (isPrimary) {
         fun Attachment.createComponent() =
             TextComponent(filename).setStyle(
