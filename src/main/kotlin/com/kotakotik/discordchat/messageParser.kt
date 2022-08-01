@@ -141,8 +141,8 @@ private suspend fun parseSingle(
         return component
     }
 
-    fun Style.noFormatting() =
-        withBold(false).withItalic(false).withStrikethrough(false).withUnderlined(false)
+    fun Style.mention() =
+        withBold(true).withItalic(false).withStrikethrough(false).withUnderlined(false)
     return when (token) {
         FormatToken.BoldToken -> parseUntil(FormatToken.BoldToken, Style.EMPTY.withBold(true))
         FormatToken.ItalicToken -> parseUntil(FormatToken.ItalicToken, Style.EMPTY.withItalic(true))
@@ -157,14 +157,14 @@ private suspend fun parseSingle(
         ).withStyle(
             Style.EMPTY.withColor(
                 ChatFormatting.BLUE
-            ).noFormatting()
+            ).mention()
         )
         is FormatToken.RoleMentionToken -> {
             val role = guild.await().getRoleOrNull(token.id)
             TextComponent(
                 "@" + (role?.name ?: "Unknown role")
             ).withStyle(
-                Style.EMPTY.withColor(role?.colorOrNull?.rgb ?: whiteRgb).noFormatting()
+                Style.EMPTY.withColor(role?.colorOrNull?.rgb ?: whiteRgb).mention()
             )
         }
         is FormatToken.ChannelMentionToken -> TextComponent(
@@ -172,7 +172,7 @@ private suspend fun parseSingle(
         ).withStyle(
             Style.EMPTY.withColor(
                 ChatFormatting.BLUE
-            ).noFormatting()
+            ).mention()
         )
     }
 }
