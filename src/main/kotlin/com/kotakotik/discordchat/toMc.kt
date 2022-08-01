@@ -47,17 +47,26 @@ suspend fun MessageCreateEvent.createMcMessageForDiscordMessage(
     val name = member.displayName
     if (checkLegalFromDiscord(member, name, sendIllegalMessage))
         return null
-    val color = member.roles.filter { it.hoisted }.toList().maxByOrNull { it.rawPosition }?.color?.rgb
-        ?: Int.MAX_VALUE // full white
-    val authorComponent = TextComponent("[$name]").withStyle(Style.EMPTY.withColor(color))
-
-    val messageComponent = TextComponent("").append(authorComponent).append(" ")
-    messageComponent.append(
+    val authorComponent = coroutineScope.async {
+        val color =
+            member.roles.filter { it.hoisted && it.hasColor }.toList().maxByOrNull { it.rawPosition }?.color?.rgb
+                ?: whiteRgb
+        TextComponent("[$name]").withStyle(Style.EMPTY.withColor(color))
+    }
+    val contentComponent = coroutineScope.async {
         discordFormattingToMc(
             coroutineScope.async(start = CoroutineStart.LAZY) { message.getGuild() },
             message.content
         )
-    )
+    }
+
+    val messageComponent =
+        TextComponent("")
+            .apply {
+                append(authorComponent.await())
+                append(" ")
+                append(contentComponent.await())
+            }
 
     if (isPrimary) {
         fun Attachment.createComponent() =

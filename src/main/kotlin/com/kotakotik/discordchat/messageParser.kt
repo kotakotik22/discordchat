@@ -1,13 +1,20 @@
 package com.kotakotik.discordchat
 
+import dev.kord.common.Color
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.entity.Guild
+import dev.kord.core.entity.Role
 import kotlinx.coroutines.Deferred
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.TextComponent
 import kotlin.experimental.ExperimentalTypeInference
+
+// todo: move the utils out of here
+val whiteRgb = Color(255, 255, 255).rgb
+val Role.hasColor get() = data.color != 0
+val Role.colorOrNull get() = if (hasColor) color else null
 
 fun <T> Iterator<T>.nextOrNull() = if (hasNext()) next() else null
 
@@ -157,7 +164,7 @@ private suspend fun parseSingle(
             TextComponent(
                 "@" + (role?.name ?: "Unknown role")
             ).withStyle(
-                Style.EMPTY.withColor(role?.color?.rgb ?: Int.MAX_VALUE).noFormatting()
+                Style.EMPTY.withColor(role?.colorOrNull?.rgb ?: whiteRgb).noFormatting()
             )
         }
         is FormatToken.ChannelMentionToken -> TextComponent(
