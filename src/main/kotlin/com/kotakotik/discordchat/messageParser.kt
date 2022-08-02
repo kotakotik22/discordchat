@@ -52,66 +52,77 @@ private sealed interface FormatToken {
     val type: Type
 
     sealed interface Type
-    sealed interface SingletonFormatToken : FormatToken, Type {
+
+    sealed interface Pair : FormatToken {
+        fun backToString(): String
+        val escape: Boolean
+    }
+
+    data class BoldToken(override val escape: Boolean) : Pair {
+        companion object : Type
+
         override val type: Type
-            get() = this
+            get() = BoldToken
+
+        override fun backToString(): String =
+            "**"
     }
 
-    object BoldToken : SingletonFormatToken {
-        override fun toString(): String =
-            "BoldToken"
+    data class ItalicToken(override val escape: Boolean, val asterisks: Boolean) : Pair {
+        companion object : Type
+
+        override val type: Type
+            get() = ItalicToken
+
+        override fun backToString(): String =
+            if (asterisks)
+                "*"
+            else "_"
     }
 
-    object ItalicToken : SingletonFormatToken {
-        override fun toString(): String =
-            "ItalicToken"
+    data class UnderlinedToken(override val escape: Boolean) : Pair {
+        companion object : Type
+
+        override val type: Type
+            get() = UnderlinedToken
+
+        override fun backToString(): String =
+            "__"
     }
 
-    object UnderlinedToken : SingletonFormatToken {
-        override fun toString(): String =
-            "UnderlinedToken"
-    }
+    data class StrikethroughToken(override val escape: Boolean) : Pair {
+        companion object : Type
 
-    object StrikethroughToken : SingletonFormatToken {
-        override fun toString(): String =
-            "StrikethroughToken"
+        override val type: Type
+            get() = StrikethroughToken
+
+        override fun backToString(): String =
+            "~~"
     }
 
     data class PlainTextToken(val text: String) : FormatToken {
-        companion object : Type {
-            override fun toString(): String =
-                "PlainTextToken"
-        }
+        companion object : Type
 
         override val type: Type
             get() = PlainTextToken
     }
 
     data class UserMentionToken(val id: Snowflake) : FormatToken {
-        companion object : Type {
-            override fun toString(): String =
-                "UserMentionToken"
-        }
+        companion object : Type
 
         override val type: Type
             get() = UserMentionToken
     }
 
     data class RoleMentionToken(val id: Snowflake) : FormatToken {
-        companion object : Type {
-            override fun toString(): String =
-                "RoleMentionToken"
-        }
+        companion object : Type
 
         override val type: Type
             get() = RoleMentionToken
     }
 
     data class ChannelMentionToken(val id: Snowflake) : FormatToken {
-        companion object : Type {
-            override fun toString(): String =
-                "ChannelMentionToken"
-        }
+        companion object : Type
 
         override val type: Type
             get() = ChannelMentionToken
@@ -127,13 +138,16 @@ private suspend fun parseSingle(
     if (token.type == stopToken) {
         return null
     }
-    suspend fun parseUntil(stopToken: FormatToken.Type, style: Style): TextComponent {
-        val component = TextComponent("")
+    suspend fun parsePair(left: FormatToken.Pair, style: Style): TextComponent {
+        val component = TextComponent(if (left.escape) left.backToString() else "")
         while (tokens.hasNext()) {
             val c = parseSingle(tokens, stopToken, guild)
+            // c is null when we reach the stop token
             if (c == null) {
-                // only apply style if was closed
-                component.style = style
+                if (left.escape)
+                    component.append(left.backToString())
+                else
+                    component.style = style
                 break
             }
             component.append(c)
@@ -144,13 +158,16 @@ private suspend fun parseSingle(
     fun Style.mention() =
         withBold(true).withItalic(false).withStrikethrough(false).withUnderlined(false)
     return when (token) {
-        FormatToken.BoldToken -> parseUntil(FormatToken.BoldToken, Style.EMPTY.withBold(true))
-        FormatToken.ItalicToken -> parseUntil(FormatToken.ItalicToken, Style.EMPTY.withItalic(true))
-        FormatToken.StrikethroughToken -> parseUntil(
-            FormatToken.StrikethroughToken,
-            Style.EMPTY.withStrikethrough(true)
+        is FormatToken.BoldToken -> parsePair(token, Style.EMPTY.withBold(true))
+        is FormatToken.ItalicToken -> parsePair(token, Style.EMPTY.withItalic(true))
+        is FormatToken.StrikethroughToken -> parsePair(
+            token,
+            Style.EMPTY.withStrikethrough(true),
         )
-        FormatToken.UnderlinedToken -> parseUntil(FormatToken.UnderlinedToken, Style.EMPTY.withUnderlined(true))
+        is FormatToken.UnderlinedToken -> parsePair(
+            token,
+            Style.EMPTY.withUnderlined(true),
+        )
         is FormatToken.PlainTextToken -> TextComponent(token.text)
         is FormatToken.UserMentionToken -> TextComponent(
             "@" + (guild.await().getMemberOrNull(token.id)?.displayName ?: "Unknown user")
@@ -202,34 +219,46 @@ private fun tokenize(iter: ListIterator<Char>): List<FormatToken> {
         tokens.add(token)
     }
 
+    fun consumeEscaping(): Boolean {
+        val e = escaping
+        escaping = false
+        return e
+    }
+
     for (char in iter) {
-        fun appendText() {
+        fun plainText() {
+            if (consumeEscaping())
+                currentPlainText += '\\'
             currentPlainText += char
         }
-        if (!escaping) {
-            if (char == '\\') {
-                escaping = true
-                continue
-            }
-            when (char) {
-                '*' ->
-                    addToken(
-                        if (iter.consumeIf { hasNext() && next() == '*' })
-                            FormatToken.BoldToken
-                        else
-                            FormatToken.ItalicToken
-                    )
-                '_' ->
-                    addToken(
-                        if (iter.consumeIf { hasNext() && next() == '_' })
-                            FormatToken.UnderlinedToken
-                        else FormatToken.ItalicToken
-                    )
-                '~' ->
-                    if (iter.consumeIf { hasNext() && next() == '~' })
-                        addToken(FormatToken.StrikethroughToken)
-                    else appendText()
-                '<' -> {
+
+        if (escaping && char == '\\') {
+            currentPlainText += '\\'
+            escaping = false
+            continue
+        }
+        when (char) {
+            '*' ->
+                addToken(
+                    if (iter.consumeIf { hasNext() && next() == '*' })
+                        FormatToken.BoldToken(consumeEscaping())
+                    else
+                        FormatToken.ItalicToken(consumeEscaping(), true)
+                )
+            '_' ->
+                addToken(
+                    if (iter.consumeIf { hasNext() && next() == '_' })
+                        FormatToken.UnderlinedToken(consumeEscaping())
+                    else FormatToken.ItalicToken(consumeEscaping(), false)
+                )
+            '~' ->
+                if (iter.consumeIf { hasNext() && next() == '~' })
+                    addToken(FormatToken.StrikethroughToken(consumeEscaping()))
+                else plainText()
+            '<' -> {
+                if (consumeEscaping()) {
+                    plainText()
+                } else {
                     val token: FormatToken? = iter.tryGet {
                         val next = nextOrNull()
                         fun parseId(initialString: String = ""): Snowflake? {
@@ -261,16 +290,14 @@ private fun tokenize(iter: ListIterator<Char>): List<FormatToken> {
                         }
                     }
                     if (token == null)
-                        appendText()
+                        plainText()
                     else
                         addToken(token)
                 }
-                else ->
-                    appendText()
             }
-        } else {
-            escaping = false
-            appendText()
+            '\\' -> escaping = true
+            else ->
+                plainText()
         }
     }
 
