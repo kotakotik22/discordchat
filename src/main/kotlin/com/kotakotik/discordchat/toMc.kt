@@ -22,19 +22,6 @@ fun createMcMessageForMinecraftMessage(author: String, message: String): Compone
     return TextComponent("<$author> $message")
 }
 
-private fun parse(iter: ListIterator<Char>, component: MutableComponent) {
-    var escaping = false
-    for (c in iter) {
-        if (escaping) {
-            escaping = false
-
-        } else {
-            escaping = c == '\\'
-
-        }
-    }
-}
-
 suspend fun MessageCreateEvent.createMcMessageForDiscordMessage(
     mainWebhook: Webhook,
     message: Message,
