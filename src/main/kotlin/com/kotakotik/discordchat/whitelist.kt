@@ -9,11 +9,13 @@ import dev.kord.core.behavior.edit
 import dev.kord.core.behavior.interaction.modal
 import dev.kord.core.behavior.interaction.respondEphemeral
 import dev.kord.core.behavior.interaction.response.edit
+import dev.kord.core.behavior.reply
 import dev.kord.core.builder.components.emoji
 import dev.kord.core.entity.ReactionEmoji
 import dev.kord.core.entity.channel.TextChannel
 import dev.kord.core.event.interaction.ButtonInteractionCreateEvent
 import dev.kord.core.event.interaction.ModalSubmitInteractionCreateEvent
+import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.core.on
 import dev.kord.rest.builder.message.create.actionRow
 import kotlinx.coroutines.*
@@ -163,4 +165,26 @@ suspend fun setUpWhitelist(kord: Kord) {
             }
         }
     }
+}
+
+suspend fun MessageCreateEvent.onMessageInWhitelistChannel() {
+    if (message.author?.id == kord.selfId) return
+    if (!message.content.startsWith(whitelistEverywherePrefix)) return
+    if (!Config.WhitelistEverywhere.accept)
+        return
+    val username = message.content.removePrefix(whitelistEverywherePrefix)
+    coroutineScope.launch {
+        val msg = message.reply {
+            content = "Whitelisting $username"
+        }
+        delay(5000)
+        msg.delete("Deleted automatically after 5 seconds to not clutter whitelist channel")
+    }
+    server.playerList.whiteList.add(
+        UserWhiteListEntry(
+            getGameProfile(username) ?: return message.reply {
+                content = "Could not find game profile $username"
+            }.void()
+        )
+    )
 }

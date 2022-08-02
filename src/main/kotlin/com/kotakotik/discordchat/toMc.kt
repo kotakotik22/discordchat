@@ -94,9 +94,10 @@ suspend fun MessageCreateEvent.createMcMessageForDiscordMessage(
     return messageComponent
 }
 
-suspend fun MessageCreateEvent.createMcMessage(mainWebhook: Webhook) {
-    if (message.author?.isBot != false) return
-    val component = createMcMessageForDiscordMessage(mainWebhook, message, true, sendIllegalMessage = true) ?: return
+suspend fun MessageCreateEvent.createMcMessage(mainWebhook: Webhook) = enqueue {
+    if (message.author?.isBot != false) return@enqueue
+    val component =
+        createMcMessageForDiscordMessage(mainWebhook, message, true, sendIllegalMessage = true) ?: return@enqueue
 
     server.playerList.broadcastServerMessage(component)
 }

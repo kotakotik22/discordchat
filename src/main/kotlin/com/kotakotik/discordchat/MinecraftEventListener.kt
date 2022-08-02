@@ -41,10 +41,9 @@ object MinecraftEventListener {
         }
 
         @SubscribeEvent
-        fun onServerStop(event: ServerStoppingEvent) =
-            runBlocking {
-                enqueueInstruction(Instruction.Stop)
-            }
+        fun onServerStop(event: ServerStoppingEvent) {
+            queueChannel.close()
+        }
 
         @SubscribeEvent
         fun onJoin(event: PlayerEvent.PlayerLoggedInEvent) = runBlocking {
