@@ -15,11 +15,16 @@ import net.minecraft.network.chat.ClickEvent.Action.OPEN_URL
 import net.minecraft.server.players.PlayerList
 
 const val replyChar = '⬐'
+private fun String.cutOff(beforeLen: Int): String {
+    val out = substring(0, (Config.replyCharLimit - beforeLen).coerceIn(0..length))
+    return if (out.length == length) out else "$out..."
+}
 
 fun createMcMessageForMinecraftMessage(author: String, message: String): Component? {
     if (!isLegal(author) || !isLegal(message))
         return null
-    return TextComponent("<$author> $message")
+    val authorText = "<$author> "
+    return TextComponent(authorText + message.replace("\n", "").cutOff(authorText.length))
 }
 
 suspend fun MessageCreateEvent.createMcMessageForDiscordMessage(
@@ -41,9 +46,10 @@ suspend fun MessageCreateEvent.createMcMessageForDiscordMessage(
         TextComponent("[$name]").withStyle(Style.EMPTY.withColor(color))
     }
     val contentComponent = coroutineScope.async {
+        val content = if (isPrimary) message.content else message.content.replace("\n", "").cutOff(name.length + 2)
         discordFormattingToMc(
             coroutineScope.async(start = CoroutineStart.LAZY) { message.getGuild() },
-            message.content
+            content
         )
     }
 
