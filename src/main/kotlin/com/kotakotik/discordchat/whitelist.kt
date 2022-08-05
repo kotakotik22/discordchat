@@ -134,6 +134,15 @@ suspend fun setUpWhitelist(kord: Kord) {
                     }
                     return@on
                 }
+                val gameProfile = getGameProfile(username)
+                    ?: return@on interaction.respondEphemeral {
+                        content = "Could not find profile with username $username"
+                    }.void()
+                if (server.playerList.whiteList.isWhiteListed(gameProfile))
+                    return@on interaction.respondEphemeral {
+                        content = "You are already whitelisted"
+                    }.void()
+
                 val response = async {
                     interaction.respondEphemeral {
                         content = "Creating request..."
@@ -160,7 +169,7 @@ suspend fun setUpWhitelist(kord: Kord) {
                 }
 
                 response.await().edit {
-                    content = "Request created! Please wait for a moderator to see your request."
+                    content = "Request created! Please wait for a moderator to see your request"
                 }
             }
         }
