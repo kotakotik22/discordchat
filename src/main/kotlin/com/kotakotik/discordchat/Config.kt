@@ -1,6 +1,5 @@
 package com.kotakotik.discordchat
 
-import kotlinx.coroutines.channels.Channel
 import net.minecraftforge.common.ForgeConfigSpec
 import net.minecraftforge.common.ForgeConfigSpec.Builder
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue
@@ -16,12 +15,6 @@ val token = File(tokenFilename).also {
 object Config {
     private val b = Builder()
 
-    val queueSize: Int by b.comment(
-        "The size of the message queue",
-        "if the queue reaches full capacity, " +
-                "then any code attempting to enqueue a message will suspend until there is space in the queue"
-    )
-        .define("queueSize", Channel.UNLIMITED)
     val playerAvatarUrl: String by b.comment("The avatar url to be used for player webhooks")
         .define("playerAvatarUrl", "https://crafatar.com/avatars/%s?overlay")
     val notifyOnIllegal: Boolean by b.comment("Whether to notify senders when their message or display name contains illegal characters")
