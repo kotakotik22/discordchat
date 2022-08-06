@@ -1,6 +1,5 @@
 package com.kotakotik.discordchat
 
-import com.google.gson.GsonBuilder
 import dev.kord.common.Color
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.entity.Guild
@@ -224,9 +223,7 @@ suspend fun discordFormattingToMc(guild: Deferred<Guild>, str: String): MutableC
     while (tokens.hasNext()) {
         components.add(parseSingle(tokens, null, guild) ?: continue)
     }
-    return (components.singleOrNull() ?: TextComponent("").appendAll(components)).also {
-        println(GsonBuilder().setPrettyPrinting().create().toJson(it))
-    }
+    return (components.singleOrNull() ?: TextComponent("").appendAll(components))
 }
 
 private fun tokenize(iter: ListIterator<Char>): List<FormatToken> {
