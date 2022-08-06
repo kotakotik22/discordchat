@@ -32,8 +32,8 @@ object Config {
         .define("deleteOnWhitelist", true)
     val whitelistDenial: Boolean by b.comment("Whether whitelists can be denied")
         .define("whitelistDenial", true)
-    val replyCharLimit by b.comment("How many characters are allowed in a replied to message until it is cut off")
-        .define("replyCharLimit", 50)
+    val replyCharLimit: Int by b.comment("How many characters are allowed in a replied to message until it is cut off")
+        .define("replyCharLimit", 45)
 
     init {
         WhitelistEverywhere
