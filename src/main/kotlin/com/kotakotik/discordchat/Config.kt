@@ -34,6 +34,8 @@ object Config {
         .define("whitelistDenial", true)
     val replyCharLimit: Int by b.comment("How many characters are allowed in a replied to message until it is cut off")
         .define("replyCharLimit", 45)
+    val discordFormatting: Boolean by b.comment("Whether to parse discord formatting and translate it to minecraft")
+        .define("discordFormatting", true)
 
     init {
         WhitelistEverywhere

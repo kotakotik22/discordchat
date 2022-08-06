@@ -47,10 +47,12 @@ suspend fun MessageCreateEvent.createMcMessageForDiscordMessage(
     }
     val contentComponent = coroutineScope.async {
         val content = if (isPrimary) message.content else message.content.replace("\n", "").cutOff(name.length + 2)
-        discordFormattingToMc(
-            coroutineScope.async(start = CoroutineStart.LAZY) { message.getGuild() },
-            content
-        )
+        if (Config.discordFormatting)
+            discordFormattingToMc(
+                coroutineScope.async(start = CoroutineStart.LAZY) { message.getGuild() },
+                content
+            )
+        else TextComponent(content)
     }
 
     val messageComponent =
