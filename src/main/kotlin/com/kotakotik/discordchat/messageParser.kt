@@ -1,5 +1,6 @@
 package com.kotakotik.discordchat
 
+import com.google.gson.GsonBuilder
 import dev.kord.common.Color
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.entity.Guild
@@ -7,6 +8,7 @@ import dev.kord.core.entity.Role
 import kotlinx.coroutines.Deferred
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.MutableComponent
 import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.TextComponent
 import kotlin.experimental.ExperimentalTypeInference
@@ -47,6 +49,19 @@ inline fun <T> ListIterator<T>.consumeIf(action: Iterator<T>. () -> Boolean): Bo
 
 inline fun <T> Iterator<T>.nextIs(func: (T) -> Boolean) =
     hasNext() && func(next())
+
+fun <T : MutableComponent> T.appendAll(components: Iterable<Component>): T {
+    for (c in components)
+        append(c)
+    return this
+}
+
+private fun TextComponent.appendAllOrSingle(components: Collection<MutableComponent>): TextComponent =
+    components.singleOrNull()?.let { single ->
+        TextComponent(this@appendAllOrSingle.string + single.string).apply {
+            style = this@appendAllOrSingle.style.applyTo(single.style)
+        }
+    } ?: appendAll(components)
 
 private sealed interface FormatToken {
     val type: Type
@@ -133,41 +148,50 @@ private suspend fun parseSingle(
     tokens: Iterator<FormatToken>,
     stopToken: FormatToken.Type?,
     guild: Deferred<Guild>
-): Component? {
+): MutableComponent? {
     val token = tokens.next()
     if (token.type == stopToken) {
         return null
     }
-    suspend fun parsePair(left: FormatToken.Pair, style: Style): TextComponent {
-        val component = TextComponent(if (left.escape) left.backToString() else "")
-        while (tokens.hasNext()) {
-            val c = parseSingle(tokens, stopToken, guild)
-            // c is null when we reach the stop token
-            if (c == null) {
-                if (left.escape)
-                    component.append(left.backToString())
+
+    // i wish i could inline this...
+    suspend fun parsePair(
+        left: FormatToken.Pair,
+        styleCreate: Style.() -> Style
+    ): MutableComponent {
+        val str = if (left.escape) left.backToString() else ""
+        val extras = arrayListOf<MutableComponent>()
+
+        while (true) {
+            if (!tokens.hasNext())
+                return if (left.escape)
+                    TextComponent(str).appendAllOrSingle(extras)
                 else
-                    component.style = style
-                break
-            }
-            component.append(c)
+                    TextComponent(left.backToString() + str).appendAllOrSingle(extras)
+            val c = parseSingle(tokens, left.type, guild)
+            // c is null when we reach the stop token
+                ?: return if (left.escape)
+                    TextComponent(str + left.backToString()).appendAllOrSingle(extras)
+                else {
+                    TextComponent(str).appendAllOrSingle(extras).apply {
+                        style = style.applyTo(styleCreate(Style.EMPTY))
+                    }
+                }
+            extras.add(c)
         }
-        return component
     }
 
     fun Style.mention() =
         withBold(true).withItalic(false).withStrikethrough(false).withUnderlined(false)
     return when (token) {
-        is FormatToken.BoldToken -> parsePair(token, Style.EMPTY.withBold(true))
-        is FormatToken.ItalicToken -> parsePair(token, Style.EMPTY.withItalic(true))
+        is FormatToken.BoldToken -> parsePair(token) { withBold(true) }
+        is FormatToken.ItalicToken -> parsePair(token) { withItalic(true) }
         is FormatToken.StrikethroughToken -> parsePair(
-            token,
-            Style.EMPTY.withStrikethrough(true),
-        )
+            token
+        ) { withStrikethrough(true) }
         is FormatToken.UnderlinedToken -> parsePair(
-            token,
-            Style.EMPTY.withUnderlined(true),
-        )
+            token
+        ) { withUnderlined(true) }
         is FormatToken.PlainTextToken -> TextComponent(token.text)
         is FormatToken.UserMentionToken -> TextComponent(
             "@" + (guild.await().getMemberOrNull(token.id)?.displayName ?: "Unknown user")
@@ -194,13 +218,15 @@ private suspend fun parseSingle(
     }
 }
 
-suspend fun discordFormattingToMc(guild: Deferred<Guild>, str: String): TextComponent {
+suspend fun discordFormattingToMc(guild: Deferred<Guild>, str: String): MutableComponent {
     val tokens = tokenize(str.toList().listIterator()).iterator()
-    val component = TextComponent("")
+    val components = arrayListOf<MutableComponent>()
     while (tokens.hasNext()) {
-        component.append(parseSingle(tokens, null, guild) ?: continue)
+        components.add(parseSingle(tokens, null, guild) ?: continue)
     }
-    return component
+    return (components.singleOrNull() ?: TextComponent("").appendAll(components)).also {
+        println(GsonBuilder().setPrettyPrinting().create().toJson(it))
+    }
 }
 
 private fun tokenize(iter: ListIterator<Char>): List<FormatToken> {
